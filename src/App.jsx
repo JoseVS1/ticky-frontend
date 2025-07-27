@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react"
+import UserContext from "./context/UserContext"
+import { ErrorHandler } from "./components/ErrorHandler"
+import { Routes, Route } from "react-router"
+import { HomePage } from "./components/pages/HomePage"
+import { ProtectedRoute } from "./components/ProtectedRoute"
+import { SignupPage } from "./components/pages/SignupPage"
+import { LoginPage } from "./components/pages/LoginPage"
+import {jwtDecode} from "jwt-decode"
+import { Navbar } from "./components/Navbar"
 
-function App() {
-  const [count, setCount] = useState(0)
+export const App = () => {
+  const [user, setUser] = useState(null);
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState([]);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+
+  useEffect(() => {
+    const getUser = async id => {
+      try {
+        const response = await fetch(`${baseUrl}/api/users/${id}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        getUser(decoded.userId);
+      } catch (error) {
+        console.error("Failed to decode JWT", error);
+      }
+    }
+
+    setLoading(false);
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <UserContext.Provider value={{ user, setUser, todos, setTodos, loading, setLoading, errors, setErrors }}>
+      <ErrorHandler setErrors={setErrors} />
+
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={
+          <ProtectedRoute user={user} loading={loading}>
+            <HomePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </UserContext.Provider>
   )
 }
-
-export default App
