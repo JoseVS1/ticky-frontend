@@ -45,7 +45,9 @@ export const SignupPage = () => {
         setUser(data.user);
         navigate("/");
       } else {
-        setErrors(data.errors);
+        if (data.errors || data.message) {
+          setErrors({ errors: [...(data.errors ? [{message: data.errors[0].message}] : []), ...(data.message ? [{message: data.message}] : [])]});
+        }
       }
     } catch (err) {
       setErrors({ errors: [{ message: "Internal server error" }]});
@@ -86,7 +88,7 @@ export const SignupPage = () => {
             <label htmlFor="confirmPassword">Confirm password: </label>
             <input type="password" value={formData.confirmPassword} onChange={handleInputChange} name="confirmPassword" id="confirmPassword" required />
           
-            {errors.length > 0 && <Errors errors={errors} />}
+            {errors.errors && errors.errors.length > 0 && <Errors errors={errors.errors} />}
           </div>
           
           <button type="submit">Sign up</button>

@@ -36,15 +36,15 @@ export const LoginPage = () => {
 
       const data = await response.json();
 
-      console.log(data)
-
       if (response.ok) {
         localStorage.setItem("token", data.token);
         setErrors([]);
         setUser(data.user);
         navigate("/");
       } else {
-        setErrors(data.errors);
+        if (data.errors || data.message) {
+          setErrors({ errors: [...(data.errors ? [{message: data.errors[0].message}] : []), ...(data.message ? [{message: data.message}] : [])]});
+        }
       }
     } catch (err) {
       setErrors({ errors: [{ message: "Internal server error" }]});
@@ -75,7 +75,7 @@ export const LoginPage = () => {
             <label htmlFor="password">Password: </label>
             <input type="password" value={formData.password} onChange={handleInputChange} name="password" id="password" required />
         
-            {errors.length > 0 && <Errors errors={errors} />}
+            {errors.errors && errors.errors.length > 0 && <Errors errors={errors.errors} />}
           </div>
         
           <button type="submit">Log in</button>

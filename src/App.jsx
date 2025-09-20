@@ -12,6 +12,7 @@ import { Navbar } from "./components/Navbar"
 export const App = () => {
   const [user, setUser] = useState(null);
   const [todos, setTodos] = useState([]);
+  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState([]);
   const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -24,6 +25,8 @@ export const App = () => {
 
         if (response.ok) {
           setUser(data.user);
+          setTodos(data.user.todos);
+          setTags(data.user.tags);
         }
       } catch (error) {
         console.error(error);
@@ -45,7 +48,7 @@ export const App = () => {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, setUser, todos, setTodos, loading, setLoading, errors, setErrors }}>
+    <UserContext.Provider value={{ user, setUser, todos, setTodos, tags, setTags, loading, setLoading, errors, setErrors }}>
       <ErrorHandler setErrors={setErrors} />
 
       <Navbar />
