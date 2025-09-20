@@ -14,7 +14,8 @@ export const HomePage = () => {
     tags: []
   });
   const [filterTodoFormData, setFilterTodoFormData] = useState({
-    tags: []
+    tags: [],
+    status: "all"
   })
   const [tagFormData, setTagFormData] = useState({
     name: ""
@@ -24,7 +25,9 @@ export const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setFilteredTodos(todos);
+    if (filterTodoFormData.status === "all") {
+      setFilteredTodos(todos);
+    }
   }, [todos]);
 
   const toggleIsCreatingTodo = () => {
@@ -153,19 +156,48 @@ export const HomePage = () => {
     }));
   };
 
+  const handleFilterStatusChange = e => {
+    setFilterTodoFormData(prevFilterTodoFormData => (
+      {
+        ...prevFilterTodoFormData,
+        status: e.target.value
+      }
+    ))
+  }
+
   const handleFilterSubmit = e => {
     e.preventDefault();
-    const tagsSelected = filterTodoFormData.tags.map(tag => Number(tag));
-    setFilteredTodos(todos.filter(todo => {
-      const todoTags = todo.tags.map(tag => tag.id);
-      return tagsSelected.every(tagId => todoTags.includes(tagId));
-    }))
+    let results = [];
+
+    // Tag filtering
+    let tagsSelected = filterTodoFormData.tags.map(tag => Number(tag));
+
+    if (tagsSelected.length === 1 && tagsSelected[0] === 0) {
+      results = todos;
+    } else {
+      if (tagsSelected.includes(0)) {
+        tagsSelected = tagsSelected.filter(tag => tag !== 0);
+      }
+
+      results = todos.filter(todo => {
+        const todoTags = todo.tags.map(tag => tag.id);
+        return tagsSelected.every(tagId => todoTags.includes(tagId));
+      });
+    }
+
+    // Status filtering
+    if (filterTodoFormData.status !== "all") {
+      results = results.filter(x => x.status === filterTodoFormData.status);
+    }
+
+    setFilteredTodos(results);
   };
 
   const handleResetFilters = () => {
     setFilteredTodos(todos);
     setFilterTodoFormData({
-      tags: []
+      tags: [],
+      status: "all"
     });
   };
 
@@ -224,11 +256,18 @@ export const HomePage = () => {
             ))}
           </select>
 
+          <label htmlFor="status">Status</label>
+          <select name="status" id="status" value={filterTodoFormData.status} onChange={handleFilterStatusChange}>
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+
           <button type="button" onClick={handleResetFilters}>Reset filters</button>
           <button>Apply filters</button>
         </form>
 
-        <TodoList todos={filteredTodos || todos} />
+        <TodoList todos={filteredTodos || todos} setFilteredTodos={setFilteredTodos} />
       </div>  
     </>
   )

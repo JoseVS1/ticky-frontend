@@ -2,9 +2,9 @@ import { useContext, useState } from "react"
 import UserContext from "../context/UserContext";
 import { useNavigate } from "react-router";
 
-export const Todo = ({ todo }) => {
+export const Todo = ({ todo, setFilteredTodos }) => {
     const [currentTodo, setCurrentTodo] = useState(todo);
-    const { setUser, setTodos, tags, errors, setErrors } = useContext(UserContext);
+    const { setUser, todos, setTodos, tags, errors, setErrors } = useContext(UserContext);
     const [selected, setSelected] = useState(false);
     const [completed, setCompleted] = useState(todo.status === "completed");
     const [isEditing, setIsEditing] = useState(false);
@@ -40,6 +40,8 @@ export const Todo = ({ todo }) => {
             if (response.ok) {
                 setCurrentTodo(data.todo);
                 setCompleted(data.todo.status === "completed");
+                setFilteredTodos(prevFilteredTodos => prevFilteredTodos.filter(todo => todo.id !== data.todo.id));
+                setTodos(prevTodos => prevTodos.map(todo => todo.id === data.todo.id ? data.todo : todo));
             } else {
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem("token");
@@ -96,6 +98,7 @@ export const Todo = ({ todo }) => {
             if (response.ok) {
                 setCurrentTodo(data.todo);
                 setIsEditing(false);
+                setTodos(prevTodos => prevTodos.map(todo => todo.id === data.todo.id ? data.todo : todo));
             } else {
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem("token");
