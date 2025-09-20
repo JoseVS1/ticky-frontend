@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import UserContext from "../../context/UserContext"
 import { TodoList } from "../TodoList";
 import { Errors } from "../Errors";
@@ -22,6 +22,10 @@ export const HomePage = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
   const [filteredTodos, setFilteredTodos] = useState(todos);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setFilteredTodos(todos);
+  }, [todos]);
 
   const toggleIsCreatingTodo = () => {
     setTodoFormData({
@@ -210,7 +214,6 @@ export const HomePage = () => {
       <div>
         <h2>Current To-Dos</h2>
 
-        {/* TODO: Filter by tag, date */}
         <h3>Filter by</h3>
         <form onSubmit={handleFilterSubmit}>
           <label htmlFor="tags">Tags</label>
@@ -224,8 +227,6 @@ export const HomePage = () => {
           <button type="button" onClick={handleResetFilters}>Reset filters</button>
           <button>Apply filters</button>
         </form>
-
-        
 
         <TodoList todos={filteredTodos || todos} />
       </div>  
