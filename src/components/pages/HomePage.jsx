@@ -3,6 +3,7 @@ import UserContext from "../../context/UserContext"
 import { TodoList } from "../TodoList";
 import { Errors } from "../Errors";
 import { Navigate, useNavigate } from "react-router";
+import { fetchWithAuth } from "../../helpers/api"
 
 export const HomePage = () => {
   const { user, setUser, todos, setTodos, tags, setTags, errors, setErrors } = useContext(UserContext);
@@ -70,11 +71,10 @@ export const HomePage = () => {
     e.preventDefault()
 
     try {
-      const response = await fetch(`${baseUrl}/api/todos`, {
+      const response = await fetchWithAuth(`${baseUrl}/api/todos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({
           title: todoFormData.title,
@@ -99,7 +99,6 @@ export const HomePage = () => {
         }
       }
     } catch (err) {
-      console.log(err)
       setErrors({ errors: [{ message: "Internal server error" }]});
     }
   };
@@ -108,11 +107,10 @@ export const HomePage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${baseUrl}/api/tags`, {
+      const response = await fetchWithAuth(`${baseUrl}/api/tags`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({
           name: tagFormData.name
@@ -135,7 +133,6 @@ export const HomePage = () => {
         }
       }
     } catch (err) {
-      console.log(err)
       setErrors({ errors: [{ message: "Internal server error" }]});
     }
   };

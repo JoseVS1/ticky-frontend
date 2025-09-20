@@ -10,7 +10,6 @@ export const LoginPage = () => {
   });
   const { user, setUser, errors, setErrors } = useContext(UserContext);
   const navigate = useNavigate();
-
   const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
   useEffect(() => {
@@ -37,7 +36,8 @@ export const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
         setErrors([]);
         setUser(data.user);
         navigate("/");

@@ -1,6 +1,7 @@
 import { useContext, useState } from "react"
 import UserContext from "../context/UserContext";
 import { useNavigate } from "react-router";
+import { fetchWithAuth } from "../helpers/api"
 
 export const Todo = ({ todo, setFilteredTodos }) => {
     const [currentTodo, setCurrentTodo] = useState(todo);
@@ -24,11 +25,10 @@ export const Todo = ({ todo, setFilteredTodos }) => {
 
     const toggleCompleted = async () => {
         try {
-            const response = await fetch(`${baseUrl}/api/todos/${todo.id}`, {
+            const response = await fetchWithAuth(`${baseUrl}/api/todos/${todo.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({
                     title: currentTodo.title,
@@ -80,11 +80,10 @@ export const Todo = ({ todo, setFilteredTodos }) => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${baseUrl}/api/todos/${todo.id}`, {
+            const response = await fetchWithAuth(`${baseUrl}/api/todos/${todo.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({
                     title: formData.title,
@@ -113,11 +112,10 @@ export const Todo = ({ todo, setFilteredTodos }) => {
 
     const handleDeleteTodo = async () => {
         try {
-            const response = await fetch(`${baseUrl}/api/todos/${todo.id}`, {
+            const response = await fetchWithAuth(`${baseUrl}/api/todos/${todo.id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
             });
             const data = await response.json();

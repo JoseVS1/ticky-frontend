@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { NavLink, useNavigate } from "react-router"
 import UserContext from "../context/UserContext";
+import { fetchWithAuth } from "../helpers/api";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -8,9 +9,24 @@ export const Navbar = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
   const handleLogout = async () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/");
+    try {
+      const response = await fetchWithAuth(`${baseUrl}/api/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        setUser(null);
+        navigate("/");
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (
