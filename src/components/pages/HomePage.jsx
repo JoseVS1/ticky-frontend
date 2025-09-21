@@ -17,7 +17,8 @@ export const HomePage = () => {
   });
   const [filterTodoFormData, setFilterTodoFormData] = useState({
     tags: [],
-    status: "all"
+    status: "all",
+    priority: "all"
   })
   const [tagFormData, setTagFormData] = useState({
     name: ""
@@ -156,12 +157,17 @@ export const HomePage = () => {
   };
 
   const handleFilterStatusChange = e => {
-    setFilterTodoFormData(prevFilterTodoFormData => (
-      {
+    setFilterTodoFormData(prevFilterTodoFormData => ({
         ...prevFilterTodoFormData,
         status: e.target.value
-      }
-    ))
+      }))
+  };
+  
+  const handleFilterPriorityChange = e => {
+    setFilterTodoFormData(prevFilterTodoFormData => ({
+      ...prevFilterTodoFormData,
+      priority: e.target.value
+    }))
   }
 
   const handleFilterSubmit = e => {
@@ -189,6 +195,11 @@ export const HomePage = () => {
       results = results.filter(x => x.status === filterTodoFormData.status);
     }
 
+    // Priority filtering
+    if (filterTodoFormData.priority !== "all") {
+      results = results.filter(x => x.priority === filterTodoFormData.priority);
+    }
+
     setFilteredTodos(results);
   };
 
@@ -196,7 +207,8 @@ export const HomePage = () => {
     setFilteredTodos(todos);
     setFilterTodoFormData({
       tags: [],
-      status: "all"
+      status: "all",
+      priority: "all"
     });
   };
 
@@ -275,6 +287,14 @@ export const HomePage = () => {
             <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
+          </select>
+
+          <label htmlFor="priority">Priority</label>
+          <select name="priority" id="priority" value={filterTodoFormData.priority} onChange={handleFilterPriorityChange}>
+            <option value="all">All</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
           </select>
 
           <button type="button" onClick={handleResetFilters}>Reset filters</button>
