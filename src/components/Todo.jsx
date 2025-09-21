@@ -14,6 +14,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
         title: todo.title,
         description: todo.description || "",
         status: todo.status,
+        priority: todo.priority,
         tags: currentTags
     });
     const navigate = useNavigate();
@@ -60,6 +61,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
                 title: currentTodo.title,
                 description: currentTodo.description || "",
                 status: currentTodo.status,
+                priority: currentTodo.priority,
                 tags: currentTags
             });
         }
@@ -89,6 +91,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
                     title: formData.title,
                     description: formData.description,
                     status: formData.status,
+                    priority: formData.priority,
                     tags: formData.tags
                 })
             });
@@ -142,12 +145,22 @@ export const Todo = ({ todo, setFilteredTodos }) => {
         }));
     };
 
+    const handlePriorityChange = e => {
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            priority: e.target.value
+        }));
+    };
+
   return (
     <li>
         <h3><button onClick={toggleCompleted}>{completed ? "✅" : "⬛️"}</button> <span onClick={toggleSelected}>{currentTodo.title}</span></h3>
 
         {selected && (
-            <p>{currentTodo.description}</p>
+            <div>
+                <p>{currentTodo.description}</p>
+                <span>Priority: {`${currentTodo.priority[0].toUpperCase()}${currentTodo.priority.slice(1)}`}</span>
+            </div>
         )}
 
         {currentTodo.tags && currentTodo.tags.length > 0 && <p>Tags: {currentTodo.tags.map((tag, i)=> (`${tag.name}${i + 1 === currentTodo.tags.length ? "" : ", "}`))}</p>}
@@ -162,6 +175,14 @@ export const Todo = ({ todo, setFilteredTodos }) => {
 
                 <label htmlFor="description">Description:</label>
                 <textarea name="description" id="description" value={formData.description} onChange={handleInputChange}></textarea>
+
+                <label htmlFor="priority">Priority:</label>
+                <select name="priority" id="priority" value={formData.priority} onChange={handlePriorityChange}>
+                    <option value="none">None</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
 
                 <label htmlFor="tags">Tags:</label>
                 <select name="tags" id="tags" multiple value={formData.tags} onChange={handleTagsChange}>

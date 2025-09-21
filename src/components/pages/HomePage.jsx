@@ -12,6 +12,7 @@ export const HomePage = () => {
   const [todoFormData, setTodoFormData] = useState({
     title: "",
     description: "",
+    priority: "none",
     tags: []
   });
   const [filterTodoFormData, setFilterTodoFormData] = useState({
@@ -79,6 +80,7 @@ export const HomePage = () => {
         body: JSON.stringify({
           title: todoFormData.title,
           description: todoFormData.description,
+          priority: todoFormData.priority,
           tags: todoFormData.tags
         })
       });
@@ -198,6 +200,13 @@ export const HomePage = () => {
     });
   };
 
+  const handlePriorityChange = e => {
+    setTodoFormData(prevTodoFormData => ({
+      ...prevTodoFormData,
+      priority: e.target.value
+    }));
+  };
+
   return (
     <>
       <h1>Ticky To-Do</h1>
@@ -224,6 +233,14 @@ export const HomePage = () => {
 
           <label htmlFor="description">Description:</label>
           <input type="text" name="description" id="description" value={todoFormData.description} onChange={handleInputChange} />
+
+          <label htmlFor="priority">Priority:</label>
+          <select name="priority" id="priority" value={todoFormData.priority} onChange={handlePriorityChange}>
+            <option value="none">None</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
 
           <label htmlFor="tags">Tags</label>
           <select name="tags" id="tags" multiple value={todoFormData.tags} onChange={handleTagsChange}>
