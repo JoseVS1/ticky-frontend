@@ -20,7 +20,7 @@ export const HomePage = () => {
     tags: [],
     status: "all",
     priority: "all",
-    dueDate: "any"
+    dueDate: "all"
   })
   const [tagFormData, setTagFormData] = useState({
     name: ""
@@ -167,17 +167,10 @@ export const HomePage = () => {
     }));
   };
 
-  const handleFilterStatusChange = e => {
-    setFilterTodoFormData(prevFilterTodoFormData => ({
-        ...prevFilterTodoFormData,
-        status: e.target.value
-      }))
-  };
-  
-  const handleFilterPriorityChange = e => {
+  const handleFilterChange = e => {
     setFilterTodoFormData(prevFilterTodoFormData => ({
       ...prevFilterTodoFormData,
-      priority: e.target.value
+      [e.target.name] : e.target.value
     }))
   }
 
@@ -211,6 +204,31 @@ export const HomePage = () => {
       results = results.filter(x => x.priority === filterTodoFormData.priority);
     }
 
+    // Due Date filtering
+    switch (filterTodoFormData.dueDate) {
+      case "dueToday":
+        results = results.filter(x => {
+            const formattedToday = now.getFullYear() + "-" +
+                String(now.getMonth() + 1).padStart(2, "0") + "-" +
+                String(now.getDate()).padStart(2, "0");
+            const dueDate = new Date(x.dueDate);
+            const formattedDueDate = dueDate.getFullYear() + "-" +
+                String(dueDate.getMonth() + 1).padStart(2, "0") + "-" +
+                String(dueDate.getDate()).padStart(2, "0");
+
+            if (formattedDueDate === formattedToday) {
+                return x;
+            }
+        })
+        break;
+      case "overdue":
+        results = results.filter(x => x.dueDate && new Date(x.dueDate).getTime() < now.getTime());
+        break;
+      case "noDueDate":
+        results = results.filter(x => !x.dueDate);
+        break;
+    };
+
     setFilteredTodos(results);
   };
 
@@ -219,7 +237,8 @@ export const HomePage = () => {
     setFilterTodoFormData({
       tags: [],
       status: "all",
-      priority: "all"
+      priority: "all",
+      dueDate: "all"
     });
   };
 
@@ -297,18 +316,26 @@ export const HomePage = () => {
           </select>
 
           <label htmlFor="status">Status</label>
-          <select name="status" id="status" value={filterTodoFormData.status} onChange={handleFilterStatusChange}>
+          <select name="status" id="status" value={filterTodoFormData.status} onChange={handleFilterChange}>
             <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
           </select>
 
           <label htmlFor="priority">Priority</label>
-          <select name="priority" id="priority" value={filterTodoFormData.priority} onChange={handleFilterPriorityChange}>
+          <select name="priority" id="priority" value={filterTodoFormData.priority} onChange={handleFilterChange}>
             <option value="all">All</option>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
+          </select>
+
+          <label htmlFor="dueDate">Due Date</label>
+          <select name="dueDate" id="dueDate" value={filterTodoFormData.dueDate} onChange={handleFilterChange}>
+            <option value="all">Any</option>
+            <option value="dueToday">Due Today</option>
+            <option value="overdue">Overdue</option>
+            <option value="noDueDate">No due date</option>
           </select>
 
           <button type="button" onClick={handleResetFilters}>Reset filters</button>

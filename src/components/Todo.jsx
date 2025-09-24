@@ -52,7 +52,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
                 setIsDueToday(false);
             }
 
-            if (new Date(currentTodo.dueDate).getTime() < now.getTime()) {
+            if (currentTodo.dueDate && new Date(currentTodo.dueDate).getTime() < now.getTime()) {
                 setIsOverdue(true);
             } else {
                 setIsOverdue(false);
