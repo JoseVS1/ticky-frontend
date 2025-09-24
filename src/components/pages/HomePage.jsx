@@ -13,12 +13,14 @@ export const HomePage = () => {
     title: "",
     description: "",
     priority: "none",
+    dueDate: "",
     tags: []
   });
   const [filterTodoFormData, setFilterTodoFormData] = useState({
     tags: [],
     status: "all",
-    priority: "all"
+    priority: "all",
+    dueDate: "any"
   })
   const [tagFormData, setTagFormData] = useState({
     name: ""
@@ -26,6 +28,12 @@ export const HomePage = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
   const [filteredTodos, setFilteredTodos] = useState(todos);
   const navigate = useNavigate();
+  const now = new Date();
+  const formattedNow = now.getFullYear() + "-" +
+  String(now.getMonth() + 1).padStart(2, "0") + "-" +
+  String(now.getDate()).padStart(2, "0") + "T" +
+  String(now.getHours()).padStart(2, "0") + ":" +
+  String(now.getMinutes()).padStart(2, "0");
 
   useEffect(() => {
     if (filterTodoFormData.status === "all") {
@@ -37,6 +45,8 @@ export const HomePage = () => {
     setTodoFormData({
       title: "",
       description: "",
+      priority: "none",
+      dueDate: "",
       tags: []
     });
 
@@ -82,6 +92,7 @@ export const HomePage = () => {
           title: todoFormData.title,
           description: todoFormData.description,
           priority: todoFormData.priority,
+          dueDate: todoFormData.dueDate ? new Date(todoFormData.dueDate).toISOString() : "",
           tags: todoFormData.tags
         })
       });
@@ -253,6 +264,9 @@ export const HomePage = () => {
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
+
+          <label htmlFor="dueDate">Due Date:</label>
+          <input type="datetime-local" name="dueDate" id="dueDate" min={formattedNow} value={todoFormData.dueDate} onChange={handleInputChange}/>
 
           <label htmlFor="tags">Tags</label>
           <select name="tags" id="tags" multiple value={todoFormData.tags} onChange={handleTagsChange}>
