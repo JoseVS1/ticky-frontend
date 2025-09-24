@@ -9,6 +9,7 @@ export const HomePage = () => {
   const { user, setUser, todos, setTodos, tags, setTags, errors, setErrors } = useContext(UserContext);
   const [isCreatingTodo, setIsCreatingTodo] = useState(false);
   const [isCreatingTag, setIsCreatingTag] = useState(false);
+  const [searchBarText, setSearchBarText] = useState("");
   const [todoFormData, setTodoFormData] = useState({
     title: "",
     description: "",
@@ -176,19 +177,20 @@ export const HomePage = () => {
 
   const handleFilterSubmit = e => {
     e.preventDefault();
-    let results = [];
+    const initialTodos = searchBarText !== "" ? todos.filter(todo => todo.title.toLowerCase().includes(searchBarText.toLowerCase()) || todo.description && todo.description.toLowerCase().includes(searchBarText.toLowerCase())) : todos;
+    let results;
 
     // Tag filtering
     let tagsSelected = filterTodoFormData.tags.map(tag => Number(tag));
 
     if (tagsSelected.length === 1 && tagsSelected[0] === 0) {
-      results = todos;
+      results = initialTodos;
     } else {
       if (tagsSelected.includes(0)) {
         tagsSelected = tagsSelected.filter(tag => tag !== 0);
       }
 
-      results = todos.filter(todo => {
+      results = initialTodos.filter(todo => {
         const todoTags = todo.tags.map(tag => tag.id);
         return tagsSelected.every(tagId => todoTags.includes(tagId));
       });
@@ -233,7 +235,12 @@ export const HomePage = () => {
   };
 
   const handleResetFilters = () => {
-    setFilteredTodos(todos);
+    if (searchBarText !== "") {
+      setFilteredTodos(todos.filter(todo => todo.title.toLowerCase().includes(searchBarText.toLowerCase()) || todo.description && todo.description.toLowerCase().includes(searchBarText.toLowerCase())));
+    } else {
+      setFilteredTodos(todos);
+    }
+    
     setFilterTodoFormData({
       tags: [],
       status: "all",
@@ -247,6 +254,19 @@ export const HomePage = () => {
       ...prevTodoFormData,
       priority: e.target.value
     }));
+  };
+
+  const handleSearchSubmit = e => {
+    e.preventDefault();
+
+    setFilteredTodos(todos.filter(todo =>
+      todo.title.toLowerCase().includes(searchBarText.toLowerCase()) ||
+      todo.description && todo.description.toLowerCase().includes(searchBarText.toLowerCase())));
+  };
+  
+  const handleClearSearch = () => {
+    setSearchBarText("");
+    setFilteredTodos(todos);
   };
 
   return (
@@ -304,6 +324,13 @@ export const HomePage = () => {
 
       <div>
         <h2>Current To-Dos</h2>
+
+        <form onSubmit={handleSearchSubmit}>
+          <input type="text" name="searchBar" id="searchBar" value={searchBarText} onChange={e => setSearchBarText(e.target.value)} />
+          
+          <button type="button" onClick={handleClearSearch}>Clear search</button>
+          <button type="submit">Search</button>
+        </form>
 
         <h3>Filter by</h3>
         <form onSubmit={handleFilterSubmit}>
