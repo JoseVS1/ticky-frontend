@@ -22,7 +22,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
         description: todo.description || "",
         status: todo.status,
         priority: todo.priority,
-        dueDate: new Date(todo.dueDate).toLocaleString(),
+        dueDate: todo.dueDate !== null ? new Date(todo.dueDate).toLocaleString() : "",
         tags: currentTags
     });
     const navigate = useNavigate();
@@ -104,7 +104,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
                 description: currentTodo.description || "",
                 status: currentTodo.status,
                 priority: currentTodo.priority,
-                dueDate: toDatetimeLocal(currentTodo.dueDate),
+                dueDate: currentTodo.dueDate ? toDatetimeLocal(currentTodo.dueDate) : "",
                 tags: currentTags
             });
         }
@@ -230,7 +230,7 @@ export const Todo = ({ todo, setFilteredTodos }) => {
                 </select>
 
                 <label htmlFor="dueDate">Due Date:</label>
-                <input type="datetime-local" name="dueDate" id="dueDate" min={formattedNow} value={toDatetimeLocal(formData.dueDate)} onChange={handleInputChange} />
+                <input type="datetime-local" name="dueDate" id="dueDate" min={formattedNow} value={formData.dueDate} onChange={handleInputChange} />
 
                 <label htmlFor="tags">Tags:</label>
                 <select name="tags" id="tags" multiple value={formData.tags} onChange={handleTagsChange}>

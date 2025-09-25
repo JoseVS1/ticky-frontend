@@ -22,7 +22,8 @@ export const HomePage = () => {
     status: "all",
     priority: "all",
     dueDate: "all"
-  })
+  });
+  const [sortTodoFormData, setSortTodoFormData] = useState("newest");
   const [tagFormData, setTagFormData] = useState({
     name: ""
   });
@@ -269,6 +270,66 @@ export const HomePage = () => {
     setFilteredTodos(todos);
   };
 
+  const handleSortSubmit = e => {
+    e.preventDefault();
+    let results = [...filteredTodos];
+
+    switch (sortTodoFormData) {
+      case "newest":
+        results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      case "oldest":
+        results.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        break;
+      case "a-z":
+        results.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "z-a":
+        results.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      case "earliest": // Due date (earliest first)
+        results.sort((a, b) => {
+          const dateA = a.dueDate ? new Date(a.dueDate) : Infinity;
+          const dateB = b.dueDate ? new Date(b.dueDate) : Infinity;
+          return dateA - dateB;
+        });
+        break;
+      case "latest": // Due date (latest first)
+        results.sort((a, b) => {
+          const dateA = a.dueDate ? new Date(a.dueDate) : -Infinity;
+          const dateB = b.dueDate ? new Date(b.dueDate) : -Infinity;
+          return dateB - dateA;
+        });
+        break;
+      case "priorityHighToLow":
+        results.sort((a, b) => {
+          const values = {
+            none: 0,
+            low: 1,
+            medium: 2,
+            high: 3
+          };
+
+          return values[b.priority] - values[a.priority];
+        });
+        break;
+      case "priorityLowToHigh":
+        results.sort((a, b) => {
+          const values = {
+            none: 0,
+            low: 1,
+            medium: 2,
+            high: 3
+          };
+
+          return values[a.priority] - values[b.priority];
+        });
+        break;
+    };
+
+    setFilteredTodos(results);
+  }
+
   return (
     <>
       <h1>Ticky To-Do</h1>
@@ -367,6 +428,22 @@ export const HomePage = () => {
 
           <button type="button" onClick={handleResetFilters}>Reset filters</button>
           <button>Apply filters</button>
+        </form>
+
+        <h3>Sort by</h3>
+        <form onSubmit={handleSortSubmit}>
+          <select name="sort" id="sort" value={sortTodoFormData} onChange={e => setSortTodoFormData(e.target.value)}>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="a-z">Title (A-Z)</option>
+            <option value="z-a">Title (Z-A)</option>
+            <option value="earliest">Due date (earliest)</option>
+            <option value="latest">Due date (latest)</option>
+            <option value="priorityHighToLow">Priority (high-low)</option>
+            <option value="priorityLowToHigh">Priority (low-high)</option>
+          </select>
+
+          <button>Apply sorting</button>
         </form>
 
         <TodoList todos={filteredTodos || todos} setFilteredTodos={setFilteredTodos} />
